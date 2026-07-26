@@ -23,7 +23,7 @@ defmodule UAInspector.MixProject do
 
   def application do
     [
-      extra_applications: extra_applications(Mix.env()) ++ [:logger],
+      extra_applications: [:inets, :logger, :ssl],
       mod: {UAInspector.Application, []}
     ]
   end
@@ -57,7 +57,6 @@ defmodule UAInspector.MixProject do
       {:dialyxir, "~> 1.4", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.18.0", only: :test, runtime: false},
-      {:hackney, "~> 1.0"},
       {:yamerl, "~> 0.7"}
     ]
   end
@@ -103,9 +102,6 @@ defmodule UAInspector.MixProject do
       formatters: ["html"]
     ]
   end
-
-  defp extra_applications(:test), do: [:inets]
-  defp extra_applications(_), do: []
 
   defp package do
     [

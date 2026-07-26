@@ -154,14 +154,26 @@ defmodule UAInspector.Config do
   ## Download Configuration
 
   Using the default configuration all download requests for your database files
-  are done using [`:hackney`](https://hex.pm/packages/hackney). To pass custom
-  configuration values to hackney you can use the key `:http_opts`:
+  are done using `:httpc` from Erlang/OTP, so no additional dependencies are
+  required. To pass custom configuration values you can use the key
+  `:http_opts`:
 
-      # increase download timeout to 10 seconds (default: 5 seconds)
+      # increase download timeout to 60 seconds (default: 30 seconds)
       config :ua_inspector,
-        http_opts: [recv_timeout: 10_000]
+        http_opts: [timeout: 60_000]
 
-  Please look at `:hackney.request/5` for a complete list of available options.
+  These values are used as the `HTTPOptions` of `:httpc.request/4`. Please look
+  there for a complete list of available options.
+
+  Certificate verification is enabled by default using the trust store of your
+  operating system. Configuring `:ssl` yourself replaces these defaults
+  completely:
+
+      config :ua_inspector,
+        http_opts: [ssl: [verify: :verify_none]]
+
+  Proxies are not configured per request. Use `:httpc.set_options/1` to define
+  them for the default profile before downloading.
 
   If you want to change the library used to download the databases you can
   configure a module implementing the `UAInspector.Downloader.Adapter`
@@ -198,7 +210,7 @@ defmodule UAInspector.Config do
     vendor_fragment: "/regexes"
   ]
 
-  @default_downloader_adapter UAInspector.Downloader.Adapter.Hackney
+  @default_downloader_adapter UAInspector.Downloader.Adapter.Httpc
   @default_yaml_reader {:yamerl_constr, :file, [[:str_node_as_binary]]}
 
   @doc """

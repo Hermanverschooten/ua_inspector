@@ -2,8 +2,13 @@
 
 ## v4.0.0-dev
 
+- Enhancements
+    - Downloads are done using `:httpc` from Erlang/OTP, removing all third party runtime dependencies except `:yamerl`
+
 - Backwards incompatible changes
     - Minimum required Elixir version is now `~> 1.17`
+    - The `:hackney` dependency and `UAInspector.Downloader.Adapter.Hackney` have been removed. If you want to keep using hackney you can configure a `:downloader_adapter` implementing the `UAInspector.Downloader.Adapter` behaviour
+    - The `:http_opts` configuration is now passed as the `HTTPOptions` of `:httpc.request/4`. Hackney specific options (i.e. `recv_timeout`) need to be replaced with their `:httpc` equivalent (i.e. `timeout`)
 
 ## v3.12.0 (2026-02-21)
 
