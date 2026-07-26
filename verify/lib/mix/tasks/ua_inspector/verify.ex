@@ -105,7 +105,11 @@ defmodule Mix.Tasks.UaInspector.Verify do
   defp maybe_download(%{quick: true}), do: :ok
 
   defp maybe_download(_) do
-    :ok = Downloader.download()
+    :ok =
+      case Downloader.download() do
+        :ok -> :ok
+        {:error, errors} -> Mix.raise("Download failed: #{inspect(errors)}")
+      end
 
     :ok = Fixtures.Client.download()
     :ok = Fixtures.ClientHints.download()

@@ -74,9 +74,12 @@ defmodule Mix.Tasks.UaInspector.Download do
   end
 
   defp perform_download(opts) do
-    :ok = Downloader.download(:client_hints)
-    :ok = Downloader.download(:databases)
-    :ok = Downloader.download(:short_code_maps)
+    :ok =
+      case Downloader.download() do
+        :ok -> :ok
+        {:error, errors} -> Mix.raise(download_error_message(errors))
+      end
+
     :ok = Downloader.README.write()
     :ok = Downloader.Release.write()
 
@@ -85,6 +88,15 @@ defmodule Mix.Tasks.UaInspector.Download do
     end
 
     :ok
+  end
+
+  defp download_error_message(errors) do
+    details =
+      Enum.map_join(errors, "\n", fn {remote, reason} ->
+        "  #{remote}\n      #{inspect(reason)}"
+      end)
+
+    "Download failed for #{length(errors)} file(s):\n\n#{details}"
   end
 
   defp request_confirmation(opts) do

@@ -4,9 +4,11 @@
 
 - Enhancements
     - Downloads are done using `:httpc` from Erlang/OTP, removing all third party runtime dependencies except `:yamerl`
+    - Failing downloads no longer raise a `MatchError` but are collected and returned, so an unreachable remote can no longer cascade into a crash of the calling application
 
 - Backwards incompatible changes
     - Minimum required Elixir version is now `~> 1.17`
+    - `UAInspector.Downloader.download/0` and `UAInspector.Downloader.download/1` now return `:ok | {:error, [{remote, reason}]}`. The `mix ua_inspector.download` task aborts with an error message if any file fails to download
     - The `:hackney` dependency and `UAInspector.Downloader.Adapter.Hackney` have been removed. If you want to keep using hackney you can configure a `:downloader_adapter` implementing the `UAInspector.Downloader.Adapter` behaviour
     - The `:http_opts` configuration is now passed as the `HTTPOptions` of `:httpc.request/4`. Hackney specific options (i.e. `recv_timeout`) need to be replaced with their `:httpc` equivalent (i.e. `timeout`)
 

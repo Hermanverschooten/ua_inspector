@@ -147,4 +147,37 @@ defmodule Mix.Tasks.UaInspector.DownloadTest do
 
     File.rm_rf!(test_path)
   end
+
+  test "download failures abort the task" do
+    Mix.shell(Mix.Shell.IO)
+
+    orig_adapter = Application.get_env(:ua_inspector, :downloader_adapter)
+    orig_path = Application.get_env(:ua_inspector, :database_path)
+    test_path = Path.expand("../../downloads_failing", __DIR__)
+
+    Application.put_env(:ua_inspector, :database_path, test_path)
+
+    Application.put_env(
+      :ua_inspector,
+      :downloader_adapter,
+      UAInspector.DownloaderTest.FailingAdapter
+    )
+
+    on_exit(fn ->
+      Application.put_env(:ua_inspector, :database_path, orig_path)
+
+      case orig_adapter do
+        nil -> Application.delete_env(:ua_inspector, :downloader_adapter)
+        adapter -> Application.put_env(:ua_inspector, :downloader_adapter, adapter)
+      end
+
+      File.rm_rf!(test_path)
+    end)
+
+    assert_raise Mix.Error, ~r/Download failed for \d+ file\(s\)/, fn ->
+      capture_io(fn -> MixTask.run(["--force", "--quiet"]) end)
+    end
+
+    refute File.exists?(Path.join(test_path, "ua_inspector.release"))
+  end
 end
