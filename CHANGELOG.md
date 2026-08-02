@@ -4,6 +4,7 @@
 
 - Enhancements
     - Default upstream database version is now `6.5.1`
+    - Upstream improvements for detections have been integrated
     - Downloads are done using `:httpc` from Erlang/OTP, removing all third party runtime dependencies except `:yamerl`
     - Failing downloads no longer raise a `MatchError` but are collected and returned, so an unreachable remote can no longer cascade into a crash of the calling application
 
